@@ -28,3 +28,18 @@ The game currently supports:
 Use the arrow keys to move, `SPACE` to jump, and `F` to shoot bullets.
 
 Further improvements, including multiplayer features, may be added later.
+
+## Multiplayer Server
+
+A simple TCP server is included for experimental multiplayer support.
+
+1. Start the server:
+   ```bash
+   python server.py
+   ```
+2. Run the multiplayer client in another terminal:
+   ```bash
+   python multiplayer_main.py
+   ```
+
+Each running client connects to the server and shares player positions with others.
