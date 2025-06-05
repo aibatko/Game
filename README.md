@@ -1,10 +1,17 @@
 # Simple Platformer Game
 
-This repository contains a small platformer game built with Python and Pygame. The game currently supports:
+This repository contains a small platformer game built with Python and Pygame. It has been refactored into several modules for easier development:
+
+- `game/player.py` – the player sprite and movement logic
+- `game/map.py` – creation of the level platforms
+- `game/weapon.py` – simple projectile weapon
+- `game/settings.py` – configuration constants
+
+The game currently supports:
 
 - Basic player movement (left, right, and jumping)
 - Simple gravity and collision with platforms
-- Firing arrows from a bow using the `F` key
+- Shooting bullets with the `F` key
 - A few example platforms for parkour
 
 ## Running the game
@@ -18,6 +25,6 @@ This repository contains a small platformer game built with Python and Pygame. T
    python main.py
    ```
 
-Use the arrow keys to move, `SPACE` to jump, and `F` to shoot arrows.
+Use the arrow keys to move, `SPACE` to jump, and `F` to shoot bullets.
 
 Further improvements, including multiplayer features, may be added later.
