@@ -20,24 +20,41 @@ class NetworkClient:
         self.player_id = None
         self.running = True
         self.callbacks = []
+        self._pending = []
 
     def connect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
-        # receive our id
-        data = self.socket.recv(1024).decode('utf-8').strip()
-        if data.startswith('ID:'):
-            self.player_id = int(data.split(':')[1])
-        thread = threading.Thread(target=self._listen, daemon=True)
-        thread.start()
+        # receive our id, handling possible interleaved messages
+        buffer = ""
+        while True:
+            chunk = self.socket.recv(1024).decode('utf-8')
+            if not chunk:
+                raise ConnectionError("Server closed before sending ID")
+            buffer += chunk
+            while "\n" in buffer:
+                line, buffer = buffer.split("\n", 1)
+                if line.startswith("ID:"):
+                    self.player_id = int(line.split(":")[1])
+                    thread = threading.Thread(target=self._listen, daemon=True)
+                    thread.start()
+                    if buffer:
+                        self._pending.append(buffer)
+                    return
+                else:
+                    self._pending.append(line)
 
     def _listen(self):
+        buffer = "".join(self._pending)
+        self._pending.clear()
         while self.running:
             try:
                 data = self.socket.recv(1024)
                 if not data:
                     break
-                for line in data.decode('utf-8').splitlines():
+                buffer += data.decode('utf-8')
+                while "\n" in buffer:
+                    line, buffer = buffer.split("\n", 1)
                     for cb in self.callbacks:
                         cb(line)
             except Exception:
