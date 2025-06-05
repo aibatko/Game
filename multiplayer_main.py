@@ -20,7 +20,23 @@ class NetworkClient:
         self.player_id = None
         self.running = True
         self.callbacks = []
+        # store messages received when no callbacks are registered yet
         self._pending = []
+
+    def add_callback(self, callback):
+        """Register a callback and flush any queued messages."""
+        self.callbacks.append(callback)
+        if self._pending:
+            for msg in list(self._pending):
+                callback(msg)
+            self._pending.clear()
+
+    def _dispatch(self, message):
+        if self.callbacks:
+            for cb in self.callbacks:
+                cb(message)
+        else:
+            self._pending.append(message)
 
     def connect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,10 +55,13 @@ class NetworkClient:
                     thread = threading.Thread(target=self._listen, daemon=True)
                     thread.start()
                     if buffer:
-                        self._pending.append(buffer)
+                        # buffer may contain additional messages
+                        for extra in buffer.split('\n'):
+                            if extra:
+                                self._dispatch(extra)
                     return
                 else:
-                    self._pending.append(line)
+                    self._dispatch(line)
 
     def _listen(self):
         buffer = "".join(self._pending)
@@ -55,8 +74,7 @@ class NetworkClient:
                 buffer += data.decode('utf-8')
                 while "\n" in buffer:
                     line, buffer = buffer.split("\n", 1)
-                    for cb in self.callbacks:
-                        cb(line)
+                    self._dispatch(line)
             except Exception:
                 break
         self.running = False
@@ -156,7 +174,7 @@ def main():
             except ValueError:
                 pass
 
-    client.callbacks.append(handle_network)
+    client.add_callback(handle_network)
 
     FIRE_DELAY = 300  # milliseconds
     last_shot_time = 0
