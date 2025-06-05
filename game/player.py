@@ -7,8 +7,18 @@ from . import settings
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((40, 60))
-        self.image.fill(settings.BLUE)
+        # create a simple pixel art player with transparent background
+        self.image = pygame.Surface((40, 60), pygame.SRCALPHA)
+        # head
+        pygame.draw.rect(self.image, settings.YELLOW, (15, 5, 10, 10))
+        # body
+        pygame.draw.rect(self.image, settings.BLUE, (12, 20, 16, 20))
+        # arms
+        pygame.draw.rect(self.image, settings.BLACK, (8, 20, 4, 15))
+        pygame.draw.rect(self.image, settings.BLACK, (28, 20, 4, 15))
+        # legs
+        pygame.draw.rect(self.image, settings.BLACK, (14, 40, 6, 15))
+        pygame.draw.rect(self.image, settings.BLACK, (20, 40, 6, 15))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.vel_x = 0
