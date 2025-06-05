@@ -46,6 +46,11 @@ class Player(pygame.sprite.Sprite):
         # horizontal movement
         self.rect.x += self.vel_x
         self._collide(self.vel_x, 0, platforms)
+        # keep player within map bounds
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > settings.MAP_WIDTH:
+            self.rect.right = settings.MAP_WIDTH
 
         # vertical movement
         self.rect.y += self.vel_y
