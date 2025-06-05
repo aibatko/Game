@@ -49,7 +49,17 @@ def main():
             with lock:
                 player_id = next_id
                 next_id += 1
+                # capture ids of players that were already connected
+                existing_ids = list(clients.keys())
                 clients[player_id] = conn
+
+            # inform the new client about players already in the game
+            for pid in existing_ids:
+                try:
+                    conn.sendall(f"JOIN:{pid}\n".encode('utf-8'))
+                except Exception:
+                    pass
+
             thread = threading.Thread(target=handle_client, args=(conn, addr, player_id), daemon=True)
             thread.start()
             broadcast(f"JOIN:{player_id}\n", sender=conn)
