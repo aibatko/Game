@@ -6,6 +6,7 @@ This repository contains a small platformer game built with Python and Pygame. I
 - `game/map.py` – creation of the level platforms
 - `game/weapon.py` – simple projectile weapon
 - `game/settings.py` – configuration constants
+- `game/enemy.py` – enemy sprites that can be shot
 
 The game currently supports:
 
@@ -13,6 +14,7 @@ The game currently supports:
 - Simple gravity and collision with platforms
 - Shooting bullets with the `F` key
 - A few example platforms for parkour
+- Enemies that spawn periodically and can be destroyed with bullets
 
 ## Running the game
 
