@@ -1,6 +1,6 @@
 import random
 import pygame
-from pygame.locals import QUIT, KEYDOWN, K_f
+from pygame.locals import QUIT, KEYDOWN, KEYUP, K_f
 
 from game import settings
 from game.player import Player
@@ -25,6 +25,9 @@ def main():
 
     enemy_spawn_time = 0
     SPAWN_DELAY = 2000  # milliseconds
+    FIRE_DELAY = 300  # milliseconds between bullets
+    last_shot_time = 0
+    shooting = False
 
     running = True
     while running:
@@ -32,7 +35,13 @@ def main():
             if event.type == QUIT:
                 running = False
             if event.type == KEYDOWN and event.key == K_f:
-                # spawn bullet at the front of the player depending on the direction
+                shooting = True
+            if event.type == KEYUP and event.key == K_f:
+                shooting = False
+
+        if shooting:
+            current_time = pygame.time.get_ticks()
+            if current_time - last_shot_time >= FIRE_DELAY:
                 if player.direction > 0:
                     bullet_x = player.rect.right
                 else:
@@ -40,6 +49,7 @@ def main():
                 bullet = Bullet(bullet_x, player.rect.centery, player.direction)
                 bullets.add(bullet)
                 all_sprites.add(bullet)
+                last_shot_time = current_time
 
         player.update(platforms)
         bullets.update()

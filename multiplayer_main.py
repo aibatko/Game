@@ -1,7 +1,7 @@
 import socket
 import threading
 import pygame
-from pygame.locals import QUIT, KEYDOWN, K_f
+from pygame.locals import QUIT, KEYDOWN, KEYUP, K_f
 
 from game import settings
 from game.player import Player
@@ -111,15 +111,27 @@ def main():
 
     client.callbacks.append(handle_network)
 
+    FIRE_DELAY = 300  # milliseconds
+    last_shot_time = 0
+    shooting = False
+
     running = True
     while running and client.running:
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
             if event.type == KEYDOWN and event.key == K_f:
+                shooting = True
+            if event.type == KEYUP and event.key == K_f:
+                shooting = False
+
+        if shooting:
+            current_time = pygame.time.get_ticks()
+            if current_time - last_shot_time >= FIRE_DELAY:
                 bullet = Bullet(player.rect.centerx, player.rect.centery, player.direction)
                 bullets.add(bullet)
                 all_sprites.add(bullet)
+                last_shot_time = current_time
 
         player.update(platforms)
         bullets.update()
