@@ -15,6 +15,8 @@ The game currently supports:
 - Shooting bullets with the `F` key
 - A few example platforms for parkour
 - Enemies that spawn periodically and can be destroyed with bullets
+- A scrolling camera that follows the player
+- A much larger map with additional platforms
 
 ## Running the game
 

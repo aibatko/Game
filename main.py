@@ -30,6 +30,7 @@ def main():
     shooting = False
 
     running = True
+    camera_x = 0
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -58,7 +59,7 @@ def main():
         # spawn enemies periodically
         current_time = pygame.time.get_ticks()
         if current_time - enemy_spawn_time > SPAWN_DELAY:
-            x = random.randint(50, settings.SCREEN_WIDTH - 50)
+            x = random.randint(50, settings.MAP_WIDTH - 50)
             enemy = Enemy(x, settings.SCREEN_HEIGHT - 40)
             enemies.add(enemy)
             all_sprites.add(enemy)
@@ -67,8 +68,13 @@ def main():
         # check bullet collisions with enemies
         pygame.sprite.groupcollide(enemies, bullets, True, True)
 
+        # update camera to follow the player
+        camera_x = player.rect.centerx - settings.SCREEN_WIDTH // 2
+        camera_x = max(0, min(camera_x, settings.MAP_WIDTH - settings.SCREEN_WIDTH))
+
         screen.fill(settings.WHITE)
-        all_sprites.draw(screen)
+        for sprite in all_sprites:
+            screen.blit(sprite.image, (sprite.rect.x - camera_x, sprite.rect.y))
         pygame.display.flip()
         clock.tick(settings.FPS)
 
