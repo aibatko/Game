@@ -21,7 +21,6 @@ def broadcast(message, sender=None):
 
 
 def handle_client(conn, addr, player_id):
-    conn.sendall(f"ID:{player_id}\n".encode('utf-8'))
     try:
         with conn:
             while True:
@@ -52,6 +51,13 @@ def main():
                 # capture ids of players that were already connected
                 existing_ids = list(clients.keys())
                 clients[player_id] = conn
+
+            # send the assigned id before any other messages
+            try:
+                conn.sendall(f"ID:{player_id}\n".encode('utf-8'))
+            except Exception:
+                conn.close()
+                continue
 
             # inform the new client about players already in the game
             for pid in existing_ids:
