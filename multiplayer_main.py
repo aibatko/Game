@@ -50,6 +50,12 @@ class NetworkClient:
         except Exception:
             self.running = False
 
+    def send_bullet(self, x, y, direction):
+        try:
+            self.socket.sendall(f"BULLET:{x},{y},{direction}\n".encode('utf-8'))
+        except Exception:
+            self.running = False
+
     def close(self):
         self.running = False
         if self.socket:
@@ -66,6 +72,35 @@ class RemotePlayer(Player):
         pass
 
 
+class MultiplayerScene:
+    """Container for multiplayer game objects."""
+
+    def __init__(self, player, platforms):
+        self.player = player
+        self.remote_players = {}
+        self.bullets = pygame.sprite.Group()
+        self.all_sprites = pygame.sprite.Group(player)
+        self.all_sprites.add(platforms)
+
+    def add_remote_player(self, pid):
+        rp = RemotePlayer()
+        self.remote_players[pid] = rp
+        self.all_sprites.add(rp)
+        return rp
+
+    def remove_remote_player(self, pid):
+        rp = self.remote_players.pop(pid, None)
+        if rp:
+            self.all_sprites.remove(rp)
+        return rp
+
+    def spawn_bullet(self, x, y, direction):
+        bullet = Bullet(x, y, direction)
+        self.bullets.add(bullet)
+        self.all_sprites.add(bullet)
+        return bullet
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
@@ -75,37 +110,32 @@ def main():
     client.connect()
 
     player = Player(100, settings.SCREEN_HEIGHT - 100)
-    bullets = pygame.sprite.Group()
     platforms = create_platforms()
-
-    remote_players = {}
-
-    all_sprites = pygame.sprite.Group()
-    all_sprites.add(player)
-    all_sprites.add(platforms)
+    scene = MultiplayerScene(player, platforms)
 
     def handle_network(message):
         if message.startswith('JOIN:'):
             pid = int(message.split(':')[1])
             if pid != client.player_id:
-                rp = RemotePlayer()
-                remote_players[pid] = rp
-                all_sprites.add(rp)
+                scene.add_remote_player(pid)
         elif message.startswith('LEAVE:'):
             pid = int(message.split(':')[1])
-            rp = remote_players.pop(pid, None)
-            if rp:
-                all_sprites.remove(rp)
+            scene.remove_remote_player(pid)
         else:
             try:
-                pid, rest = message.split(':')
+                pid, rest = message.split(':', 1)
                 pid = int(pid)
                 if pid == client.player_id:
                     return
-                x_str, y_str = rest.split(',')
-                rp = remote_players.get(pid)
-                if rp:
-                    rp.rect.topleft = (int(x_str), int(float(y_str)))
+                if rest.startswith('BULLET:'):
+                    bullet_data = rest.split('BULLET:', 1)[1]
+                    x_str, y_str, dir_str = bullet_data.split(',')
+                    scene.spawn_bullet(int(x_str), int(float(y_str)), int(dir_str))
+                else:
+                    x_str, y_str = rest.split(',')
+                    rp = scene.remote_players.get(pid)
+                    if rp:
+                        rp.rect.topleft = (int(x_str), int(float(y_str)))
             except ValueError:
                 pass
 
@@ -128,18 +158,17 @@ def main():
         if shooting:
             current_time = pygame.time.get_ticks()
             if current_time - last_shot_time >= FIRE_DELAY:
-                bullet = Bullet(player.rect.centerx, player.rect.centery, player.direction)
-                bullets.add(bullet)
-                all_sprites.add(bullet)
+                scene.spawn_bullet(player.rect.centerx, player.rect.centery, player.direction)
+                client.send_bullet(player.rect.centerx, player.rect.centery, player.direction)
                 last_shot_time = current_time
 
         player.update(platforms)
-        bullets.update()
+        scene.bullets.update()
 
         client.send_position(player.rect.x, player.rect.y)
 
         screen.fill(settings.WHITE)
-        all_sprites.draw(screen)
+        scene.all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(settings.FPS)
 
