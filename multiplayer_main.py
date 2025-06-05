@@ -82,6 +82,11 @@ class MultiplayerScene:
         self.all_sprites = pygame.sprite.Group(player)
         self.all_sprites.add(platforms)
 
+    def draw(self, surface, camera_x=0):
+        """Draw all sprites offset by the camera position."""
+        for sprite in self.all_sprites:
+            surface.blit(sprite.image, (sprite.rect.x - camera_x, sprite.rect.y))
+
     def add_remote_player(self, pid):
         rp = RemotePlayer()
         self.remote_players[pid] = rp
@@ -173,8 +178,7 @@ def main():
         camera_x = max(0, min(camera_x, settings.MAP_WIDTH - settings.SCREEN_WIDTH))
 
         screen.fill(settings.WHITE)
-        for sprite in scene.all_sprites:
-            screen.blit(sprite.image, (sprite.rect.x - camera_x, sprite.rect.y))
+        scene.draw(screen, camera_x)
         pygame.display.flip()
         clock.tick(settings.FPS)
 
