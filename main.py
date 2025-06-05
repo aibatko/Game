@@ -26,7 +26,12 @@ def main():
             if event.type == QUIT:
                 running = False
             if event.type == KEYDOWN and event.key == K_f:
-                bullet = Bullet(player.rect.centerx, player.rect.centery, player.direction)
+                # spawn bullet at the front of the player depending on the direction
+                if player.direction > 0:
+                    bullet_x = player.rect.right
+                else:
+                    bullet_x = player.rect.left
+                bullet = Bullet(bullet_x, player.rect.centery, player.direction)
                 bullets.add(bullet)
                 all_sprites.add(bullet)
 
