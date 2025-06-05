@@ -9,7 +9,7 @@ from game.map import create_platforms
 from game.weapon import Bullet
 
 HOST = '127.0.0.1'
-PORT = 5000
+PORT = 5001
 
 
 class NetworkClient:
