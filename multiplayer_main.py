@@ -146,6 +146,7 @@ def main():
     shooting = False
 
     running = True
+    camera_x = 0
     while running and client.running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -167,8 +168,13 @@ def main():
 
         client.send_position(player.rect.x, player.rect.y)
 
+        # update camera to follow the local player
+        camera_x = player.rect.centerx - settings.SCREEN_WIDTH // 2
+        camera_x = max(0, min(camera_x, settings.MAP_WIDTH - settings.SCREEN_WIDTH))
+
         screen.fill(settings.WHITE)
-        scene.all_sprites.draw(screen)
+        for sprite in scene.all_sprites:
+            screen.blit(sprite.image, (sprite.rect.x - camera_x, sprite.rect.y))
         pygame.display.flip()
         clock.tick(settings.FPS)
 
