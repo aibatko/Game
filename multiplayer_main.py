@@ -162,6 +162,7 @@ def main():
         (settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
     )
     clock = pygame.time.Clock()
+    is_fullscreen = False
 
     client = NetworkClient(args.host, args.port)
     client.connect()
@@ -218,6 +219,14 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
+            if event.type == KEYDOWN and event.key == K_f:
+                is_fullscreen = not is_fullscreen
+                if is_fullscreen:
+                    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+                else:
+                    screen = pygame.display.set_mode(
+                        (settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
+                    )
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 shooting = True
                 mouse_target = (event.pos[0] + camera_x, event.pos[1])
