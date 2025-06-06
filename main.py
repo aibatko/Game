@@ -57,7 +57,7 @@ def main():
                 last_shot_time = current_time
 
         player.update(platforms)
-        bullets.update()
+        bullets.update(platforms)
         enemies.update()
 
         # spawn enemies periodically
