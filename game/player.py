@@ -28,7 +28,8 @@ class Player(pygame.sprite.Sprite):
         self.vel_x = 0
         self.vel_y = 0
         self.speed = 5
-        self.jump_power = 10
+        # slightly higher jump to make parkour easier
+        self.jump_power = 14
         self.on_ground = False
         self.direction = 1  # 1=right, -1=left
         self.max_health = settings.MAX_HEALTH
