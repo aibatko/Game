@@ -1,5 +1,6 @@
 import socket
 import threading
+import argparse
 import pygame
 from pygame.locals import QUIT, KEYDOWN, KEYUP, K_f
 
@@ -9,8 +10,6 @@ from game.map import create_platforms
 from game.weapon import Bullet
 from game.utils import show_death_screen
 
-HOST = '127.0.0.1'
-PORT = 5001
 
 
 class NetworkClient:
@@ -144,11 +143,27 @@ class MultiplayerScene:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Multiplayer client")
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Server hostname or IP address"
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5001,
+        help="Server port"
+    )
+    args = parser.parse_args()
+
     pygame.init()
-    screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
+    screen = pygame.display.set_mode(
+        (settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
+    )
     clock = pygame.time.Clock()
 
-    client = NetworkClient(HOST, PORT)
+    client = NetworkClient(args.host, args.port)
     client.connect()
 
     player = Player(100, settings.SCREEN_HEIGHT - 100, client.color)

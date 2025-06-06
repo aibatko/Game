@@ -44,9 +44,11 @@ A simple TCP server is included for experimental multiplayer support.
    ```bash
    python server.py
    ```
-2. Run the multiplayer client in another terminal:
+2. Run the multiplayer client on any machine in the same network. Specify the
+   server's IP address if it is running on a different machine:
    ```bash
-   python multiplayer_main.py
+   python multiplayer_main.py --host <SERVER_IP>
    ```
 
-Each running client connects to the server and shares player positions with others.
+Each running client connects to the server and shares player positions with
+others.
