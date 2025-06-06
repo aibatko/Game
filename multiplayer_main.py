@@ -87,9 +87,9 @@ class NetworkClient:
         except Exception:
             self.running = False
 
-    def send_bullet(self, x, y, direction):
+    def send_bullet(self, x, y, target_x, target_y):
         try:
-            self.socket.sendall(f"BULLET:{x},{y},{direction}\n".encode('utf-8'))
+            self.socket.sendall(f"BULLET:{x},{y},{target_x},{target_y}\n".encode('utf-8'))
         except Exception:
             self.running = False
 
@@ -135,8 +135,8 @@ class MultiplayerScene:
             self.all_sprites.remove(rp)
         return rp
 
-    def spawn_bullet(self, x, y, direction):
-        bullet = Bullet(x, y, direction)
+    def spawn_bullet(self, x, y, target_x, target_y):
+        bullet = Bullet(x, y, target_x, target_y)
         self.bullets.add(bullet)
         self.all_sprites.add(bullet)
         return bullet
@@ -172,8 +172,13 @@ def main():
                     return
                 if rest.startswith('BULLET:'):
                     bullet_data = rest.split('BULLET:', 1)[1]
-                    x_str, y_str, dir_str = bullet_data.split(',')
-                    scene.spawn_bullet(int(x_str), int(float(y_str)), int(dir_str))
+                    x_str, y_str, tx_str, ty_str = bullet_data.split(',')
+                    scene.spawn_bullet(
+                        int(x_str),
+                        int(float(y_str)),
+                        int(tx_str),
+                        int(float(ty_str)),
+                    )
                 else:
                     x_str, y_str = rest.split(',')
                     rp = scene.remote_players.get(pid)
@@ -187,6 +192,7 @@ def main():
     FIRE_DELAY = 300  # milliseconds
     last_shot_time = 0
     shooting = False
+    mouse_target = (0, 0)
 
     running = True
     camera_x = 0
@@ -194,16 +200,27 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
-            if event.type == KEYDOWN and event.key == K_f:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 shooting = True
-            if event.type == KEYUP and event.key == K_f:
+                mouse_target = (event.pos[0] + camera_x, event.pos[1])
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 shooting = False
 
         if shooting:
             current_time = pygame.time.get_ticks()
             if current_time - last_shot_time >= FIRE_DELAY:
-                scene.spawn_bullet(player.rect.centerx, player.rect.centery, player.direction)
-                client.send_bullet(player.rect.centerx, player.rect.centery, player.direction)
+                scene.spawn_bullet(
+                    player.rect.centerx,
+                    player.rect.centery,
+                    mouse_target[0],
+                    mouse_target[1],
+                )
+                client.send_bullet(
+                    player.rect.centerx,
+                    player.rect.centery,
+                    mouse_target[0],
+                    mouse_target[1],
+                )
                 last_shot_time = current_time
 
         player.update(platforms)

@@ -12,7 +12,7 @@ The game currently supports:
 
 - Basic player movement (left, right, and jumping)
 - Simple gravity and collision with platforms
-- Shooting bullets with the `F` key
+- Shooting bullets with the left mouse button
 - A few example platforms for parkour
 - Enemies that spawn periodically and can be destroyed with bullets
 - A scrolling camera that follows the player
@@ -30,7 +30,7 @@ The game currently supports:
    python main.py
    ```
 
-Use the arrow keys to move, `SPACE` to jump, and `F` to shoot bullets.
+Use `A` and `D` to move left and right, `W` to jump, and click with the left mouse button to shoot toward the cursor.
 
 Further improvements, including multiplayer features, may be added later.
 
