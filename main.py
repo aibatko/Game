@@ -45,7 +45,13 @@ def main():
         if shooting:
             current_time = pygame.time.get_ticks()
             if current_time - last_shot_time >= FIRE_DELAY:
-                bullet = Bullet(player.rect.centerx, player.rect.centery, mouse_target[0], mouse_target[1])
+                bullet = Bullet(
+                    player.rect.centerx,
+                    player.rect.centery,
+                    mouse_target[0],
+                    mouse_target[1],
+                    owner=player,
+                )
                 bullets.add(bullet)
                 all_sprites.add(bullet)
                 last_shot_time = current_time

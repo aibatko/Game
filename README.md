@@ -18,6 +18,8 @@ The game currently supports:
 - A scrolling camera that follows the player
 - A much larger map with additional platforms
 - Randomly colored player shirts in multiplayer mode
+- Bullets deal damage to other players in multiplayer and a simple death screen
+  appears when your health reaches zero
 
 ## Running the game
 

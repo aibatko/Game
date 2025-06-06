@@ -7,6 +7,7 @@ from game import settings
 from game.player import Player
 from game.map import create_platforms
 from game.weapon import Bullet
+from game.utils import show_death_screen
 
 HOST = '127.0.0.1'
 PORT = 5001
@@ -135,8 +136,8 @@ class MultiplayerScene:
             self.all_sprites.remove(rp)
         return rp
 
-    def spawn_bullet(self, x, y, target_x, target_y):
-        bullet = Bullet(x, y, target_x, target_y)
+    def spawn_bullet(self, x, y, target_x, target_y, owner=None):
+        bullet = Bullet(x, y, target_x, target_y, owner=owner)
         self.bullets.add(bullet)
         self.all_sprites.add(bullet)
         return bullet
@@ -173,11 +174,13 @@ def main():
                 if rest.startswith('BULLET:'):
                     bullet_data = rest.split('BULLET:', 1)[1]
                     x_str, y_str, tx_str, ty_str = bullet_data.split(',')
+                    rp = scene.remote_players.get(pid)
                     scene.spawn_bullet(
                         int(x_str),
                         int(float(y_str)),
                         int(tx_str),
                         int(float(ty_str)),
+                        owner=rp,
                     )
                 else:
                     x_str, y_str = rest.split(',')
@@ -214,6 +217,7 @@ def main():
                     player.rect.centery,
                     mouse_target[0],
                     mouse_target[1],
+                    owner=player,
                 )
                 client.send_bullet(
                     player.rect.centerx,
@@ -225,6 +229,23 @@ def main():
 
         player.update(platforms)
         scene.bullets.update()
+
+        # handle bullet collisions with players
+        for bullet in list(scene.bullets):
+            if bullet.owner is player:
+                for rp in scene.remote_players.values():
+                    if bullet.rect.colliderect(rp.rect):
+                        bullet.kill()
+                        rp.health -= 1
+            else:
+                if bullet.rect.colliderect(player.rect):
+                    bullet.kill()
+                    player.health -= 1
+
+        if player.health <= 0:
+            show_death_screen(screen)
+            running = False
+            break
 
         client.send_position(player.rect.x, player.rect.y)
 
