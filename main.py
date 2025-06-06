@@ -1,6 +1,6 @@
 import random
 import pygame
-from pygame.locals import QUIT, KEYDOWN, KEYUP, K_f
+from pygame.locals import QUIT, MOUSEBUTTONDOWN
 
 from game import settings
 from game.player import Player
@@ -28,6 +28,7 @@ def main():
     FIRE_DELAY = 300  # milliseconds between bullets
     last_shot_time = 0
     shooting = False
+    mouse_target = (0, 0)
 
     running = True
     camera_x = 0
@@ -35,19 +36,16 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
-            if event.type == KEYDOWN and event.key == K_f:
+            if event.type == MOUSEBUTTONDOWN and event.button == 1:
                 shooting = True
-            if event.type == KEYUP and event.key == K_f:
+                mouse_target = (event.pos[0] + camera_x, event.pos[1])
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 shooting = False
 
         if shooting:
             current_time = pygame.time.get_ticks()
             if current_time - last_shot_time >= FIRE_DELAY:
-                if player.direction > 0:
-                    bullet_x = player.rect.right
-                else:
-                    bullet_x = player.rect.left
-                bullet = Bullet(bullet_x, player.rect.centery, player.direction)
+                bullet = Bullet(player.rect.centerx, player.rect.centery, mouse_target[0], mouse_target[1])
                 bullets.add(bullet)
                 all_sprites.add(bullet)
                 last_shot_time = current_time

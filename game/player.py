@@ -1,6 +1,6 @@
 import random
 import pygame
-from pygame.locals import K_LEFT, K_RIGHT, K_SPACE
+from pygame.locals import K_a, K_d, K_w
 
 from . import settings
 
@@ -35,13 +35,13 @@ class Player(pygame.sprite.Sprite):
     def update(self, platforms):
         keys = pygame.key.get_pressed()
         self.vel_x = 0
-        if keys[K_LEFT]:
+        if keys[K_a]:
             self.vel_x = -self.speed
             self.direction = -1
-        if keys[K_RIGHT]:
+        if keys[K_d]:
             self.vel_x = self.speed
             self.direction = 1
-        if keys[K_SPACE] and self.on_ground:
+        if keys[K_w] and self.on_ground:
             self.vel_y = -self.jump_power
 
         # apply gravity

@@ -1,10 +1,11 @@
+import math
 import pygame
 
 from . import settings
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction):
+    def __init__(self, x, y, target_x, target_y):
         super().__init__()
         # create a small pixel art bullet
         self.image = pygame.Surface((12, 4), pygame.SRCALPHA)
@@ -17,9 +18,21 @@ class Bullet(pygame.sprite.Sprite):
         pygame.draw.polygon(self.image, settings.RED, [(9, 0), (12, 2), (9, 4)])
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.speed = 10 * direction
+
+        dx = target_x - x
+        dy = target_y - y
+        dist = math.hypot(dx, dy) or 1
+        speed = 10
+        self.vel_x = speed * dx / dist
+        self.vel_y = speed * dy / dist
 
     def update(self):
-        self.rect.x += self.speed
-        if self.rect.right < 0 or self.rect.left > settings.MAP_WIDTH:
+        self.rect.x += self.vel_x
+        self.rect.y += self.vel_y
+        if (
+            self.rect.right < 0
+            or self.rect.left > settings.MAP_WIDTH
+            or self.rect.bottom < 0
+            or self.rect.top > settings.SCREEN_HEIGHT
+        ):
             self.kill()
