@@ -7,16 +7,29 @@ from . import settings
 def create_platforms():
     platforms = pygame.sprite.Group()
 
-    # ground spanning the entire map width
-    ground = Platform(0, settings.SCREEN_HEIGHT - 40, settings.MAP_WIDTH, 40)
-    platforms.add(ground)
+    ground_y = settings.SCREEN_HEIGHT - 40
 
-    # scatter some additional platforms across the map
-    step = 300
-    for i in range(1, settings.MAP_WIDTH // step):
-        x = i * step
-        platforms.add(Platform(x, settings.SCREEN_HEIGHT - 150, 120, 20))
-        if i % 2 == 0:
-            platforms.add(Platform(x + 150, settings.SCREEN_HEIGHT - 250, 120, 20))
+    # ----- ground with gaps -----
+    segment_width = 400
+    gap_width = 120
+    x = 0
+    count = 0
+    while x < settings.MAP_WIDTH:
+        width = min(segment_width, settings.MAP_WIDTH - x)
+        platforms.add(Platform(x, ground_y, width, 40))
+        x += width
+        count += 1
+        if count % 2 == 0 and x + gap_width < settings.MAP_WIDTH:
+            # leave a hole in the ground
+            x += gap_width
+
+    # ----- floating platforms and pillars -----
+    for i in range(200, settings.MAP_WIDTH, 600):
+        platforms.add(Platform(i, ground_y - 60, 80, 20))
+        platforms.add(Platform(i + 100, ground_y - 140, 100, 20))
+        platforms.add(Platform(i + 220, ground_y - 220, 120, 20))
+
+    for i in range(500, settings.MAP_WIDTH, 800):
+        platforms.add(Platform(i, ground_y - 100, 40, 100))
 
     return platforms
