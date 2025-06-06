@@ -234,6 +234,7 @@ def main():
 
         screen.fill(settings.WHITE)
         scene.draw(screen, camera_x)
+        player.draw_health(screen)
         pygame.display.flip()
         clock.tick(settings.FPS)
 

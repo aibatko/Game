@@ -14,6 +14,10 @@ YELLOW = (255, 255, 0)
 GREEN = (0, 255, 0)
 ORANGE = (255, 165, 0)
 PURPLE = (128, 0, 128)
+GRAY = (160, 160, 160)
+
+# Health
+MAX_HEALTH = 10
 
 # Colors used for players. When a new player is created a random
 # value from this list will be assigned.

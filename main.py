@@ -73,6 +73,7 @@ def main():
         screen.fill(settings.WHITE)
         for sprite in all_sprites:
             screen.blit(sprite.image, (sprite.rect.x - camera_x, sprite.rect.y))
+        player.draw_health(screen)
         pygame.display.flip()
         clock.tick(settings.FPS)
 
