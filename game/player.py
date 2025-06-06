@@ -31,6 +31,8 @@ class Player(pygame.sprite.Sprite):
         self.jump_power = 10
         self.on_ground = False
         self.direction = 1  # 1=right, -1=left
+        self.max_health = settings.MAX_HEALTH
+        self.health = self.max_health
 
     def update(self, platforms):
         keys = pygame.key.get_pressed()
@@ -75,3 +77,10 @@ class Player(pygame.sprite.Sprite):
                 if vel_y < 0:
                     self.rect.top = p.rect.bottom
                     self.vel_y = 0
+
+    def draw_health(self, surface):
+        """Draw a simple health bar in the top-left corner."""
+        for i in range(self.max_health):
+            color = settings.RED if i < self.health else settings.GRAY
+            x = 10 + i * 18
+            pygame.draw.rect(surface, color, (x, 10, 16, 16))
