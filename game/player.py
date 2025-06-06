@@ -1,3 +1,4 @@
+import random
 import pygame
 from pygame.locals import K_LEFT, K_RIGHT, K_SPACE
 
@@ -5,14 +6,17 @@ from . import settings
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, color=None):
         super().__init__()
+        # pick a random shirt color if one is not provided
+        self.color = color or random.choice(settings.PLAYER_COLORS)
+
         # create a simple pixel art player with transparent background
         self.image = pygame.Surface((40, 60), pygame.SRCALPHA)
         # head
         pygame.draw.rect(self.image, settings.YELLOW, (15, 5, 10, 10))
         # body
-        pygame.draw.rect(self.image, settings.BLUE, (12, 20, 16, 20))
+        pygame.draw.rect(self.image, self.color, (12, 20, 16, 20))
         # arms
         pygame.draw.rect(self.image, settings.BLACK, (8, 20, 4, 15))
         pygame.draw.rect(self.image, settings.BLACK, (28, 20, 4, 15))

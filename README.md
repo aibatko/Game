@@ -17,6 +17,7 @@ The game currently supports:
 - Enemies that spawn periodically and can be destroyed with bullets
 - A scrolling camera that follows the player
 - A much larger map with additional platforms
+- Randomly colored player shirts in multiplayer mode
 
 ## Running the game
 
