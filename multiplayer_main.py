@@ -18,6 +18,7 @@ class NetworkClient:
         self.port = port
         self.socket = None
         self.player_id = None
+        self.color = None
         self.running = True
         self.callbacks = []
         # store messages received when no callbacks are registered yet
@@ -51,7 +52,9 @@ class NetworkClient:
             while "\n" in buffer:
                 line, buffer = buffer.split("\n", 1)
                 if line.startswith("ID:"):
-                    self.player_id = int(line.split(":")[1])
+                    _, pid, color = line.split(":", 2)
+                    self.player_id = int(pid)
+                    self.color = tuple(map(int, color.split(',')))
                     thread = threading.Thread(target=self._listen, daemon=True)
                     thread.start()
                     if buffer:
@@ -97,9 +100,8 @@ class NetworkClient:
 
 
 class RemotePlayer(Player):
-    def __init__(self):
-        super().__init__(0, 0)
-        self.image.fill((255, 0, 0))
+    def __init__(self, color):
+        super().__init__(0, 0, color)
         self.speed = 0
 
     def update(self, *_):
@@ -121,8 +123,8 @@ class MultiplayerScene:
         for sprite in self.all_sprites:
             surface.blit(sprite.image, (sprite.rect.x - camera_x, sprite.rect.y))
 
-    def add_remote_player(self, pid):
-        rp = RemotePlayer()
+    def add_remote_player(self, pid, color):
+        rp = RemotePlayer(color)
         self.remote_players[pid] = rp
         self.all_sprites.add(rp)
         return rp
@@ -148,15 +150,17 @@ def main():
     client = NetworkClient(HOST, PORT)
     client.connect()
 
-    player = Player(100, settings.SCREEN_HEIGHT - 100)
+    player = Player(100, settings.SCREEN_HEIGHT - 100, client.color)
     platforms = create_platforms()
     scene = MultiplayerScene(player, platforms)
 
     def handle_network(message):
         if message.startswith('JOIN:'):
-            pid = int(message.split(':')[1])
+            _, pid_str, color_str = message.split(':', 2)
+            pid = int(pid_str)
+            color = tuple(map(int, color_str.split(',')))
             if pid != client.player_id:
-                scene.add_remote_player(pid)
+                scene.add_remote_player(pid, color)
         elif message.startswith('LEAVE:'):
             pid = int(message.split(':')[1])
             scene.remove_remote_player(pid)
