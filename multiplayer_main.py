@@ -243,7 +243,7 @@ def main():
                 last_shot_time = current_time
 
         player.update(platforms)
-        scene.bullets.update()
+        scene.bullets.update(platforms)
 
         # handle bullet collisions with players
         for bullet in list(scene.bullets):

@@ -24,13 +24,24 @@ class Bullet(pygame.sprite.Sprite):
         dx = target_x - x
         dy = target_y - y
         dist = math.hypot(dx, dy) or 1
-        speed = 10
+        # slow down bullet travel speed a bit so projectiles are easier to follow
+        speed = 5
         self.vel_x = speed * dx / dist
         self.vel_y = speed * dy / dist
 
-    def update(self):
+    def update(self, platforms=None):
+        """Move the bullet and destroy it on collisions or when off-screen."""
         self.rect.x += self.vel_x
         self.rect.y += self.vel_y
+
+        # remove bullet if it collides with any platform
+        if platforms:
+            for p in platforms:
+                if self.rect.colliderect(p.rect):
+                    self.kill()
+                    return
+
+        # remove bullet if it flies outside the visible area
         if (
             self.rect.right < 0
             or self.rect.left > settings.MAP_WIDTH
