@@ -6,7 +6,8 @@ def show_death_screen(screen):
     """Display a simple death screen and wait for the user to quit."""
     font = pygame.font.SysFont(None, 72)
     text = font.render("You Died", True, settings.RED)
-    text_rect = text.get_rect(center=(settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2))
+    screen_rect = screen.get_rect()
+    text_rect = text.get_rect(center=screen_rect.center)
 
     waiting = True
     while waiting:

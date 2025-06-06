@@ -33,6 +33,7 @@ The game currently supports:
    ```
 
 Use `A` and `D` to move left and right, `W` to jump, and click with the left mouse button to shoot toward the cursor.
+Press `F` at any time to toggle fullscreen mode.
 
 Further improvements, including multiplayer features, may be added later.
 
