@@ -5,7 +5,7 @@ from . import settings
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, target_x, target_y):
+    def __init__(self, x, y, target_x, target_y, owner=None):
         super().__init__()
         # create a small pixel art bullet
         self.image = pygame.Surface((12, 4), pygame.SRCALPHA)
@@ -18,6 +18,8 @@ class Bullet(pygame.sprite.Sprite):
         pygame.draw.polygon(self.image, settings.RED, [(9, 0), (12, 2), (9, 4)])
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+
+        self.owner = owner
 
         dx = target_x - x
         dy = target_y - y
