@@ -10,6 +10,8 @@ player_colors = {}
 next_id = 1
 lock = threading.Lock()
 
+print("Server starting...")
+
 
 def broadcast(message, sender=None):
     for cid, conn in list(clients.items()):
@@ -42,7 +44,9 @@ def handle_client(conn, addr, player_id):
 
 def main():
     global next_id
+    print("Intitilizing socket on server side")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        print(s.getsocketname())
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((HOST, PORT))
         s.listen()
@@ -51,7 +55,7 @@ def main():
             conn, addr = s.accept()
             with lock:
                 player_id = next_id
-                next_id += 1
+                next_id += 2
                 # capture ids of players that were already connected
                 existing_ids = list(clients.keys())
                 clients[player_id] = conn
@@ -62,6 +66,7 @@ def main():
                     "255,255,0",  # yellow
                     "255,165,0",  # orange
                     "128,0,128",  # purple
+                    "0,255,255",
                 ])
                 player_colors[player_id] = color
 
@@ -79,11 +84,13 @@ def main():
                         f"JOIN:{pid}:{player_colors[pid]}\n".encode('utf-8')
                     )
                 except Exception:
+                    print(f"Failed to send JOIN message to {addr} for player {pid}")
                     pass
 
             thread = threading.Thread(target=handle_client, args=(conn, addr, player_id), daemon=True)
             thread.start()
             broadcast(f"JOIN:{player_id}:{color}\n", sender=conn)
+            print(f"New connection from {addr}, assigned ID {player_id} with color {color}")
 
 
 if __name__ == '__main__':
